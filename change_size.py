@@ -4,7 +4,9 @@ from apng import APNG
 import time
 import glob
 import os
-from scripts.apng_square_and_optimize import *
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+#from scripts.apng_square_and_optimize import *
 
 newsize = (512, 512)
 im2 = APNG()
@@ -21,6 +23,8 @@ def padding(img, expected_size):
 
 
 def resize_with_padding(img, expected_size):
+    x, y, z = 0, 0, 0
+    pix = img.load()
     img.thumbnail((expected_size[0], expected_size[1]))
     # print(img.size)
     delta_width = expected_size[0] - img.size[0]
@@ -28,7 +32,34 @@ def resize_with_padding(img, expected_size):
     pad_width = delta_width // 2
     pad_height = delta_height // 2
     padding = (pad_width, pad_height, delta_width - pad_width, delta_height - pad_height)
-    return ImageOps.expand(img, padding)
+    return ImageOps.expand(img, padding, fill=(0,0,0,0))
+
+def resize_png(img, expected_size):
+    height = expected_size[0]
+    width = expected_size[1]
+    color = (0, 0, 0)
+    cv2.imread(img)
+    old_image_height, old_image_width, channels = img.shape
+
+
+def resize_apng(path, img, fn):
+    i = 0
+    im_list = []
+    path = path+"\\"+str(fn).split('\\')[-1].split('.')[0]
+    os.makedirs(path, exist_ok=True)
+    for png, control in img.frames:
+        filename = path+"\{i}.png".format(i=i)
+        png.save(filename)
+       # img = resize_png(filename, [512,512])
+        img = resize_with_padding(Image.open(filename), [512, 512])
+        img = img.save(filename, 'PNG')
+        im_list.append(img)
+        i+=1
+    apngImg = APNG()
+    for filename in glob.glob(path + "/*.png"):
+        apngImg.append_file(filename)
+    return apngImg
+
 
 def create_animated_sticker(rootdir):
     k = 0
