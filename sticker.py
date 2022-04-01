@@ -3,12 +3,16 @@ from PIL import Image, ImageSequence,ImageOps
 import requests
 import sys
 import os
+from os import listdir
+from os.path import isfile, join
+import glob
 import re
 import codecs
+import zipfile
 from apng import PNG, APNG
 import subprocess
 from change_size import *
-from scripts.apng_square_and_optimize import *
+#from scripts.apng_square_and_optimize import *
 im2 = APNG()
 basewidth = 512
 
@@ -115,10 +119,39 @@ def validate_savepath(pack_name):
 
 def get_gif(pack_id, list_ids, pack_name):
     pack_name = validate_savepath(pack_name)
+
+    url = 'http://dl.stickershop.LINE.naver.jp/products/0/0/1/{}/iphone/stickerpack@2x.zip'.format(pack_id)
+    filename = str(pack_id) + "-"+ url.split('/')[-1]
+    save_path = os.path.join('output',str(pack_name), filename)
+    upzip_path = os.path.join('output',str(pack_name), 'upzip')
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    os.makedirs(os.path.dirname(upzip_path), exist_ok=True)
+    resize_path = os.path.join('output',str(pack_name), 'resize')
+    os.makedirs(resize_path, exist_ok=True)
+    animation_path = os.path.join('output', str(pack_name), 'upzip', "animation@2x")
+    req = requests.get(url, stream=True)
+    with open(save_path, 'wb') as f:
+        f.write(req.content)
+    with zipfile.ZipFile(save_path, 'r') as zip_ref:
+        zip_ref.extractall(upzip_path)
+
+    files = [f for f in listdir(animation_path) if isfile(join(animation_path, f))]
+    for filename in glob.glob(animation_path+"/*.png"):
+        image = APNG.open(filename)
+        apngFile = resize_apng(animation_path, image, filename)
+        apngFile.save(resize_path+"\\" + str(filename).split('\\')[-1])
+
+
+
+
+
+def get_gif1(pack_id, list_ids, pack_name):
+    pack_name = validate_savepath(pack_name)
     i = 0
     for x in list_ids:
         save_path = os.path.join('output',str(pack_name), str(x) + '.apng')
-        url = 'https://sdl-stickershop.line.naver.jp/products/0/0/1/{}/iphone/animation/{}@2x.png'.format(pack_id, x)  # noqa: E501
+        #url = 'https://sdl-stickershop.line.naver.jp/products/0/0/1/{}/iphone/animation/{}@2x.png'.format(pack_id, x)  # noqa: E501
+        url = 'http://dl.stickershop.LINE.naver.jp/products/0/0/1/{}/iphone/stickerpack@2x.zip'.format(pack_id)
         image = requests.get(url, stream=True)
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         i = i + 1
@@ -133,6 +166,7 @@ def get_gif(pack_id, list_ids, pack_name):
         # image_temp = APNG.open(save_path)
         # temp = resize(image_temp.to_bytes())
         # temp.save(save_path)
+
 
     
 def get_png(pack_id, list_ids, pack_name):
