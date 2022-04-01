@@ -4,7 +4,7 @@ from apng import APNG
 import time
 import glob
 import os
-from scripts.apng_square_and_optimize import *
+from apng_square_and_optimize import *
 
 newsize = (512, 512)
 im2 = APNG()

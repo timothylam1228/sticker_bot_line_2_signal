@@ -130,9 +130,9 @@ def get_gif(pack_id, list_ids, pack_name):
                     f.write(chunk)
                         # image.save("result.apng")
                         # f.write(chunk)
-        image_temp = APNG.open(save_path)
-        temp = resize(image_temp.to_bytes())
-        temp.save(save_path)
+        # image_temp = APNG.open(save_path)
+        # temp = resize(image_temp.to_bytes())
+        # temp.save(save_path)
 
     
 def get_png(pack_id, list_ids, pack_name):
