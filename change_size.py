@@ -99,7 +99,7 @@ def create_animated_sticker(rootdir):
             apng_image=[]
             path = r"image/*.png"
 
-            for  filename in glob.glob(path): #assuming gif
+            for filename in glob.glob(path): #assuming gif
                 print(filename)
                 apng_image.append(filename)
 

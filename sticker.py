@@ -2,6 +2,7 @@
 from PIL import Image, ImageSequence,ImageOps
 import requests
 import sys
+import asyncio
 import os
 from os import listdir
 from os.path import isfile, join
@@ -12,6 +13,7 @@ import zipfile
 from apng import PNG, APNG
 import subprocess
 from change_size import *
+from export_signal import *
 #from scripts.apng_square_and_optimize import *
 im2 = APNG()
 basewidth = 512
@@ -140,9 +142,8 @@ def get_gif(pack_id, list_ids, pack_name):
         image = APNG.open(filename)
         apngFile = resize_apng(animation_path, image, filename)
         apngFile.save(resize_path+"\\" + str(filename).split('\\')[-1])
-
-
-
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(createPackage(pack_name, pack_name, resize_path))
 
 
 def get_gif1(pack_id, list_ids, pack_name):
@@ -163,12 +164,10 @@ def get_gif1(pack_id, list_ids, pack_name):
                     f.write(chunk)
                         # image.save("result.apng")
                         # f.write(chunk)
-        # image_temp = APNG.open(save_path)
-        # temp = resize(image_temp.to_bytes())
-        # temp.save(save_path)
+        image_temp = APNG.open(save_path)
+        temp = resize(image_temp.to_bytes())
+        temp.save(save_path)
 
-
-    
 def get_png(pack_id, list_ids, pack_name):
     pack_name = validate_savepath(pack_name)
     for x in list_ids:
