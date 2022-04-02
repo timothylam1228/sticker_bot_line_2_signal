@@ -1,6 +1,6 @@
 import os
 import glob
-
+import base64
 from signalstickers_client import StickersClient
 from signalstickers_client.models import LocalStickerPack, Sticker
 
@@ -9,8 +9,7 @@ def add_sticker(pack, path, emoji):
     stick = Sticker()
     stick.id = pack.nb_stickers
     stick.emoji = emoji
-    for filename in glob.glob(path+"/*.png"):
-        with open(filename, "rb") as f_in:
+    with open(path, "rb") as f_in:
             stick.image_data = f_in.read()
 
     pack._addsticker(stick)
@@ -42,7 +41,9 @@ async def createPackage(title, author, file_path):
     pack.cover = cover
 
     # Instanciate the client with your Signal crendentials
-    async with StickersClient(os.environ['SIGNAL_USERNAME'], os.environ['SIGNAL_PASSWORD']) as client:
+    username = bytes('a9490fc0-a153-4102-a97b-49f61ed6f4fc.2'.encode())
+    password = bytes('OcjSsRaSsoA8xEmRwbwuXg'.encode())
+    async with StickersClient(username, password) as client:
         # Upload the pack
         pack_id, pack_key = await client.upload_pack(pack)
 
